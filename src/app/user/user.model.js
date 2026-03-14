@@ -1,0 +1,49 @@
+const mongoose = require("mongoose")
+const UserSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        min:3,
+        require:true
+    },
+    email:{
+        type:String,
+        unique:true,
+        require:true
+    },
+    role:{
+        type:String,
+        enum:["admin","seller","customer"],
+        default:"customer",
+        require:true
+    },
+    status:{
+        type:String,
+        enum:["active","inactive"],
+        default:"inactive",
+        require:true
+    },
+    profile:String,
+    otp:String,
+    authToken:String,
+    expiryTime:String,
+    password:String,
+    forgetPassword:String,
+    createdBy:{
+        type:mongoose.Types.ObjectId,
+        ref:"User",
+        default:null,
+        require:true
+    },
+    updatedBy:{
+        type:mongoose.Types.ObjectId,
+        ref:"User",
+        default:null,
+        require:true
+    }
+},{
+    timestamps:true,
+    autoCreate:true,
+    autoIndex:true
+})
+const UserModel = mongoose.model("User",UserSchema)
+module.exports = UserModel
