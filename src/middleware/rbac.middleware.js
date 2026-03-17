@@ -1,8 +1,10 @@
+const AccessDenied = require("../exception/accessDenied.exception")
 const AppError = require("../exception/appError")
 
 
 const permissionCheck = (roles)=>{
     return (req,res,next)=>{
+       try {
         const user = req.authUser
         if(
             (typeof roles ==="string" && user.role !==roles)
@@ -13,6 +15,9 @@ const permissionCheck = (roles)=>{
         }else{
             next()
         }
+       } catch (exception) {
+        next(new AccessDenied())
+       }
     }
 }
 

@@ -8,7 +8,7 @@ class AuthServices {
         try {
             const user = payload
         if(file){
-            user.profile = file.filename
+            user["profile"] = file.filename
         }
         user.otp = randomString(6)
         const timeAfterTwoHours = new Date(Date.now()+(60*2+60*1000)) 

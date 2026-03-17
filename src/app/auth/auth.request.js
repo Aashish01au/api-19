@@ -10,7 +10,7 @@ const addressSchema = Joi.object({
 const registerSchema = Joi.object({
     name :Joi.string().min(3).required(),
     email:Joi.string().email().required(),
-    profile:Joi.string(),
+    profile:Joi.object(),
     address:{
         billing:addressSchema.default(null),
         shipping:addressSchema.default(null)

@@ -6,6 +6,7 @@ app.use(express.urlencoded({
     extended:false
 }))
 require("./mongodb.config")
+app.use("/asset",express.static("./public/uploader/"))
 app.use("/",routes)
 app.use((req,res,next)=>{
     next({code:404, message:"Page not found"})

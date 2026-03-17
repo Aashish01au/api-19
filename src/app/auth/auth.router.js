@@ -12,5 +12,5 @@ authRouter.post("/verify-otp",bodyValidator(verifyOTPSchema),authCtrl.verifyOTP)
 authRouter.post("/resend-otp",bodyValidator(resetOtpSchema),authCtrl.resendOTP)
 authRouter.post("/activate/:token",bodyValidator(passwordSchema),authCtrl.activateUser)
 authRouter.post("/login",bodyValidator(loginSchema),authCtrl.loginUser)
-authRouter.get("/me",auth,permissionCheck(ROLES.ADMIN),authCtrl.profile)
+authRouter.get("/me",auth,permissionCheck([ROLES.ADMIN,ROLES.CUSTOMER]),authCtrl.profile)
 module.exports = authRouter

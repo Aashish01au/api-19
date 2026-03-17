@@ -1,16 +1,16 @@
 const ValidationError = require("../exception/validationError")
 
-const bodyValidator = (schema,imagefield=null)=>{
+const bodyValidator = (schema,imagefieldName=null)=>{
     return async (req,res,next)=>{
         try {
             const data = req.body
-            if(imagefield){
-                if(req.file){
-                    data["profile"]= req.file.filename
-                }else if(req.files){
-                    data["profile"] = req.file.filename
-                }
+           if(imagefieldName){
+            if(req.file){
+                data[imagefieldName]= req.file
+            }else if(req.files){
+                data[imagefieldName]= req.files
             }
+           }
            await schema.validateAsync(data)
             next()
         } catch (exception) {
