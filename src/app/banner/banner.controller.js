@@ -18,20 +18,9 @@ class BannerController{
     }
     index = async (req,res,next)=>{
         try {
-            const page = req.query.page ?? 1
-            const limit = req.query.limit ?? 1
-            const skip = (page-1)*limit
-            const search = req.query.search ?? null
-            let filter = {}
-            if(search){
-                filter={
-                    ...filter,
-                    $or:[{title:new RegExp(search,"i")},
-                    {status:new RegExp(search,"i")},
-                    {link:new RegExp(search,"i")}
-                    ]
-                }
-            }
+            const {page,skip,limit} = await bannerSvc.getSkippedCalculated(req.query)
+            const search = req.query.search || null
+            let filter = await bannerSvc.getSearchQuery(search)
             const count = await bannerSvc.totalCount(filter)
             const banners = await bannerSvc.getAllBanners(filter,skip,limit)
             res.json({
@@ -50,7 +39,13 @@ class BannerController{
     }
     update = async (req,res,next)=>{
         try {
-            
+            // const banner = await bannerSvc.getBannerById(req.params.id)
+            // if(banner){
+            //     const data = await bannerSvc.transformUpdateBanner(req,banner)
+            //     const updatedBanner = await bannerSvc.updateBanner(banner._id,data)
+            // }else{
+            //     next( new AppError({message:"banner doies not exitt",code:400}))
+            // }
         } catch (exception) {
             console.log("UpdateBannerfunctions :",exception)
             next(exception)
@@ -91,7 +86,12 @@ class BannerController{
    
     homeList = async (req,res,next)=>{
         try {
-            
+            const banners =   await  bannerSvc.getActiveBanner()
+            res.json({
+                result:banners,
+                message:"Home List",
+                meta:null
+            })
         } catch (exception) {
             console.log("HomeListBannerfunctions :",exception)
             next(exception)

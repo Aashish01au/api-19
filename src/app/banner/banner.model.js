@@ -31,7 +31,25 @@ const BannerSchema = new mongoose.Schema({
         ref:"User",
         default:null,
         require:true
-    }
+    },
+    // deletedBy:{
+    //     type:mongoose.Types.ObjectId,
+    //     ref:"User",
+    //     require:true
+    // },
+    // deletedAt:{
+    //     type:String,
+    //     require:true
+    // }
+    // startTime:{
+    //         type:String,
+    //         require:true
+    //     },
+    // endTime:{
+    //         type:String,
+    //         require:true
+    //     }
+    
 },{
     timestamps:true,
     autoCreate:true,

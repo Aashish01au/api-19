@@ -9,8 +9,11 @@ const bodyValidator = (schema,imagefieldName=null)=>{
                 data[imagefieldName]= req.file
             }else if(req.files){
                 data[imagefieldName]= req.files
+            }else{
+                data[imagefieldName]= null
             }
            }
+           console.log(data)
            await schema.validateAsync(data)
             next()
         } catch (exception) {

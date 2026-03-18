@@ -4,7 +4,7 @@ const permissionCheck = require("../../middleware/rbac.middleware")
 const { uploaderPath, uploader } = require("../../middleware/uploaders.middleware")
 const bodyValidator = require("../../middleware/validator.middleware")
 const bannerCtrl = require("./banner.controller")
-const { createBannerSchema } = require("./banner.request")
+const { createBannerSchema, updateBannerSchema } = require("./banner.request")
 
 const bannerRouter = require("express").Router()
 bannerRouter.get("/home",bannerCtrl.homeList)
@@ -14,7 +14,7 @@ bannerRouter.route("/")
 
 bannerRouter.route("/:id")
     .get(auth,permissionCheck([ROLES.ADMIN,ROLES.CUSTOMER]),bannerCtrl.detail)
-    .put(auth,permissionCheck([ROLES.ADMIN,ROLES.CUSTOMER]))
+    .put(auth,permissionCheck([ROLES.ADMIN,ROLES.CUSTOMER]),uploaderPath("image"),uploader.single("image"),bodyValidator(updateBannerSchema,"image"),bannerCtrl.update)
     .delete(auth,permissionCheck([ROLES.ADMIN,ROLES.CUSTOMER]),bannerCtrl.delete)
     
 module.exports = bannerRouter
