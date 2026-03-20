@@ -11,7 +11,7 @@ const permissionCheck = (roles)=>{
             ||
             (Array.isArray(roles) && !(roles.includes(user.role)))
         ){
-            next(new AppError({message:"You do not have permission tomaccess the system.."}))
+            next(new AppError({message:"You do not have permission to maccess the system.."}))
         }else{
             next()
         }

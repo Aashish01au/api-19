@@ -1,16 +1,29 @@
 const mongoose = require("mongoose")
-const BannerSchema = new mongoose.Schema({
+const CategorySchema = new mongoose.Schema({
     title:{
         type:String,
-        min:3,
+        min:2,
         require:true
     },
     image:{
         type:String,
+        require:false
+    },
+    parentId:{
+        type:mongoose.Types.ObjectId,
+        ref:"Category",
+    },
+    slug:{
+        type:String,
+        unique:true,
         require:true
     },
-    link:{
-        type:String,
+    showInHome:{
+        type:Boolean,
+        require:true
+    },
+    showInMenu:{
+        type:Boolean,
         require:true
     },
     status:{
@@ -31,7 +44,6 @@ const BannerSchema = new mongoose.Schema({
         default:null,
         require:true
     },
-   
     // deletedBy:{
     //     type:mongoose.Types.ObjectId,
     //     ref:"User",
@@ -56,5 +68,5 @@ const BannerSchema = new mongoose.Schema({
     autoIndex:true
 })
 
-const BannerModel = mongoose.model("Banner",BannerSchema)
-module.exports = BannerModel
+const CategoryModel = mongoose.model("Category",CategorySchema)
+module.exports = CategoryModel

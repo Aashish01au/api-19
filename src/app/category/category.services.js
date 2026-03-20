@@ -1,11 +1,24 @@
 const AppError = require("../../exception/appError")
-const BannerModel = require("./banner.model")
-
-class BannerServices{
-    transformCreateBanner= (data,userId)=>{
+const CategoryModel = require("./category.model")
+const slugify =  require("slugify")
+class CategoryServices{
+    transformCreateCategory= (data,userId)=>{
         try {
             const formattedData = {...data}
-            formattedData.image = data.filename
+            if(data.image){
+                formattedData.image = data.image.filename
+            }else{
+                formattedData.image = null
+            }
+           if(!data.parentId || data.parentId ==="null" ){
+            formattedData.parentId = null
+           }
+            formattedData.slug = slugify(formattedData.title,{
+                replacement:true,
+                trim:true,
+                lower:true
+            })
+
             formattedData.createdBy = userId._id
             return formattedData
         } catch (exception) {
@@ -14,9 +27,13 @@ class BannerServices{
     }
     store = async (data)=>{
         try {
-            const banner = new BannerModel(data)
-            return await  banner.save()
+            const category = new CategoryModel(data)
+            return await  category.save()
         } catch (exception) {
+            if(+exception.code ===11000){
+                exception.message =  "Category Name shuld be uinque",
+                exception.code=400
+            }
             throw exception
         }
     }
@@ -53,59 +70,63 @@ class BannerServices{
         try {
            // $eq:{deletedAt:null} // deletedBy:{$eq:null}
             // filter = {...filter,deletedBy:{$eq:null}}
-            return await BannerModel.countDocuments(filter)
+            return await CategoryModel.countDocuments(filter)
         } catch (exception) {
             throw exception
         }
     } 
-    getAllBanners =  async(filter,skip,limit)=>{
+    getAllCategorys =  async(filter,skip,limit)=>{
         try {
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-            const banners = await BannerModel.find(filter)
+            const categorys = await CategoryModel.find(filter)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
+                .populate("parentId",["_id","title","status"])
                 .sort({_id:"desc"})
                 .skip(skip)
                 .limit(limit) 
-            return banners
+            return categorys
         } catch (exception) {
             throw exception
         }
     }
-    getBannerById = async (id)=>{
+    getCategoryById = async (id)=>{
         try {
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-            const banner = await BannerModel.findById(id)
+            const category = await CategoryModel.findById(id)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
-            return banner
+                .populate("parentId",["_id","title","status"])
+            return category
         } catch (exception) {
             throw exception
         }
     }
-    deleteBanner = async (id)=>{
+    deleteCategory = async (id)=>{
         try {
             //for sub-deletetion, run in Update query in in delete query 
     //update query ==> deletedBy : req.authUsser._id, deletedAt:Date.now()
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-          //  const deletded = await BannerModel.deleteOne({_id:_id})
-            //const deletded = await BannerModel.deleteMany({_id:_id})
-            const deleted = await BannerModel.findByIdAndDelete(id)
+          //  const deletded = await CategoryModel.deleteOne({_id:_id})
+            //const deletded = await CategoryModel.deleteMany({_id:_id})
+            const deleted = await CategoryModel.findByIdAndDelete(id)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
+                .populate("parentId",["_id","title","status"])
+
             if(deleted){
                 return deleted
             }else{
-                throw new AppError({message:" Banner does not exist or already Deleted", code:400})
+                throw new AppError({message:" Category does not exist or already Deleted", code:400})
             }
         } catch (exception) {
             throw exception
         }
     }
-    transformUpdateBanner = async (req,oldData)=>{
+    transformUpdateCategory = async (req,oldData)=>{
         try {
             const formattedData = {...req.body}
             if(req.file){
@@ -119,30 +140,30 @@ class BannerServices{
             throw exception
         }
     }
-    updateBanner = async(id,data)=>{
+    updateCategory = async(id,data)=>{
         try {
-            const banner = await BannerModel.findByIdAndUpdate(id,{
+            const category = await CategoryModel.findByIdAndUpdate(id,{
                 $set:data
             })
-            return banner
+            return category
         } catch (exception) {
             throw exception
         }
     }
-    getActiveBanner = async ()=>{
+    getActiveCategory = async ()=>{
         try {
-            const banners = await BannerModel.find({
+            const categorys = await CategoryModel.find({
                 status:"active",
                 // startTime: {$le:Date.now()},
                 // endTime : {$ge:Date.now()}
             })
             .sort({_id:"desc"})
             .limit(10)
-            return banners
+            return categorys
         } catch (exception) {
             throw exception
         }
     }
 }
-const bannerSvc = new BannerServices()
-module.exports = bannerSvc
+const categorySvc = new CategoryServices()
+module.exports = categorySvc

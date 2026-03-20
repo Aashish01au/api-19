@@ -39,13 +39,18 @@ class BannerController{
     }
     update = async (req,res,next)=>{
         try {
-            // const banner = await bannerSvc.getBannerById(req.params.id)
-            // if(banner){
-            //     const data = await bannerSvc.transformUpdateBanner(req,banner)
-            //     const updatedBanner = await bannerSvc.updateBanner(banner._id,data)
-            // }else{
-            //     next( new AppError({message:"banner doies not exitt",code:400}))
-            // }
+            const banner = await bannerSvc.getBannerById(req.params.id)
+            if(banner){
+                const data = await bannerSvc.transformUpdateBanner(req,banner)
+                const updatedBanner = await bannerSvc.updateBanner(banner._id,data)
+                res.json({
+                    result:updatedBanner,
+                    message:"banner updated",
+                    meta:null
+                })
+            }else{
+                next( new AppError({message:"banner doies not exitt",code:400}))
+            }
         } catch (exception) {
             console.log("UpdateBannerfunctions :",exception)
             next(exception)

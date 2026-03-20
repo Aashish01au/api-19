@@ -1,16 +1,26 @@
 const mongoose = require("mongoose")
-const BannerSchema = new mongoose.Schema({
+const BrandSchema = new mongoose.Schema({
     title:{
         type:String,
-        min:3,
+        min:2,
+        unique:true,
         require:true
     },
     image:{
         type:String,
+        require:false
+    },
+    slogan:{
+        type:String,
+        require:false
+    },
+    slug:{
+        type:String,
+        unique:true,
         require:true
     },
-    link:{
-        type:String,
+    showInHome:{
+        type:Boolean,
         require:true
     },
     status:{
@@ -31,7 +41,6 @@ const BannerSchema = new mongoose.Schema({
         default:null,
         require:true
     },
-   
     // deletedBy:{
     //     type:mongoose.Types.ObjectId,
     //     ref:"User",
@@ -56,5 +65,5 @@ const BannerSchema = new mongoose.Schema({
     autoIndex:true
 })
 
-const BannerModel = mongoose.model("Banner",BannerSchema)
-module.exports = BannerModel
+const BrandModel = mongoose.model("Brand",BrandSchema)
+module.exports = BrandModel

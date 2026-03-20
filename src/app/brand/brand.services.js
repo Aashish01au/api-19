@@ -1,11 +1,23 @@
 const AppError = require("../../exception/appError")
-const BannerModel = require("./banner.model")
-
-class BannerServices{
-    transformCreateBanner= (data,userId)=>{
+const BrandModel = require("./brand.model")
+const slugify =  require("slugify")
+class BrandServices{
+    transformCreateBrand= (data,userId)=>{
         try {
             const formattedData = {...data}
-            formattedData.image = data.filename
+            if(data.image){
+                formattedData.image = data.image.filename
+            }else{
+                formattedData.image = null
+            }
+            if(!formattedData.showInHome || formattedData.showInHome ==""){
+                formattedData.showInHome = null
+            }
+            formattedData.slug = slugify(formattedData.title,{
+                replacement:true,
+                trim:true,
+                lower:true
+            })
             formattedData.createdBy = userId._id
             return formattedData
         } catch (exception) {
@@ -14,9 +26,13 @@ class BannerServices{
     }
     store = async (data)=>{
         try {
-            const banner = new BannerModel(data)
-            return await  banner.save()
+            const brand = new BrandModel(data)
+            return await  brand.save()
         } catch (exception) {
+            if(+exception.code ===11000){
+                exception.message =  "Brand Name shuld be uinque",
+                exception.code=400
+            }
             throw exception
         }
     }
@@ -53,59 +69,59 @@ class BannerServices{
         try {
            // $eq:{deletedAt:null} // deletedBy:{$eq:null}
             // filter = {...filter,deletedBy:{$eq:null}}
-            return await BannerModel.countDocuments(filter)
+            return await BrandModel.countDocuments(filter)
         } catch (exception) {
             throw exception
         }
     } 
-    getAllBanners =  async(filter,skip,limit)=>{
+    getAllBrands =  async(filter,skip,limit)=>{
         try {
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-            const banners = await BannerModel.find(filter)
+            const brands = await BrandModel.find(filter)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
                 .sort({_id:"desc"})
                 .skip(skip)
                 .limit(limit) 
-            return banners
+            return brands
         } catch (exception) {
             throw exception
         }
     }
-    getBannerById = async (id)=>{
+    getBrandById = async (id)=>{
         try {
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-            const banner = await BannerModel.findById(id)
+            const brand = await BrandModel.findById(id)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
-            return banner
+            return brand
         } catch (exception) {
             throw exception
         }
     }
-    deleteBanner = async (id)=>{
+    deleteBrand = async (id)=>{
         try {
             //for sub-deletetion, run in Update query in in delete query 
     //update query ==> deletedBy : req.authUsser._id, deletedAt:Date.now()
             // $eq:{deletedAt:null} // deletedBy:{$eq:null}
              // filter = {...filter,deletedBy:{$eq:null}}
-          //  const deletded = await BannerModel.deleteOne({_id:_id})
-            //const deletded = await BannerModel.deleteMany({_id:_id})
-            const deleted = await BannerModel.findByIdAndDelete(id)
+          //  const deletded = await BrandModel.deleteOne({_id:_id})
+            //const deletded = await BrandModel.deleteMany({_id:_id})
+            const deleted = await BrandModel.findByIdAndDelete(id)
                 .populate("createdBy",["_id","title","status"])
                 .populate("updatedBy",["_id","title","status"])
             if(deleted){
                 return deleted
             }else{
-                throw new AppError({message:" Banner does not exist or already Deleted", code:400})
+                throw new AppError({message:" Brand does not exist or already Deleted", code:400})
             }
         } catch (exception) {
             throw exception
         }
     }
-    transformUpdateBanner = async (req,oldData)=>{
+    transformUpdateBrand = async (req,oldData)=>{
         try {
             const formattedData = {...req.body}
             if(req.file){
@@ -119,30 +135,30 @@ class BannerServices{
             throw exception
         }
     }
-    updateBanner = async(id,data)=>{
+    updateBrand = async(id,data)=>{
         try {
-            const banner = await BannerModel.findByIdAndUpdate(id,{
+            const brand = await BrandModel.findByIdAndUpdate(id,{
                 $set:data
             })
-            return banner
+            return brand
         } catch (exception) {
             throw exception
         }
     }
-    getActiveBanner = async ()=>{
+    getActiveBrand = async ()=>{
         try {
-            const banners = await BannerModel.find({
+            const brands = await BrandModel.find({
                 status:"active",
                 // startTime: {$le:Date.now()},
                 // endTime : {$ge:Date.now()}
             })
             .sort({_id:"desc"})
             .limit(10)
-            return banners
+            return brands
         } catch (exception) {
             throw exception
         }
     }
 }
-const bannerSvc = new BannerServices()
-module.exports = bannerSvc
+const brandSvc = new BrandServices()
+module.exports = brandSvc

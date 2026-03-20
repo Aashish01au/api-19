@@ -8,7 +8,7 @@ const createBannerSchema = Joi.object({
 }) 
 const updateBannerSchema = Joi.object({
     title:Joi.string().min(3).required(),
-    image:Joi.object(),
+    image:Joi.object().empty(null,{}),
     link:Joi.string().uri().required(),
     status:Joi.string().pattern(/^(active|inactive)$/).required()
 }) 
